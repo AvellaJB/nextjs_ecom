@@ -1,7 +1,21 @@
 import Head from "next/head";
-import Link from "next/link";
+import { useQuery } from "urql";
+import { PRODUCT_QUERY } from "../lib/query";
+import Product from "../components/product";
+import { Gallery } from "../styles/Gallery";
 
 export default function Home() {
+  //Festch product depuis strapi;
+
+  const [results] = useQuery({ query: PRODUCT_QUERY });
+  const { data, fetching, error } = results;
+
+  //Check for data comming ing
+
+  if (fetching) return <p>Loading...</p>;
+  if (error) return <p>Whoops !</p>;
+  const products = data.products.data;
+
   return (
     <div>
       <Head>
@@ -12,6 +26,11 @@ export default function Home() {
 
       <main>
         <h1>Hello world</h1>
+        <Gallery>
+          {products.map((product) => (
+            <Product product={product} key={product.attributes.slug} />
+          ))}
+        </Gallery>
       </main>
     </div>
   );
