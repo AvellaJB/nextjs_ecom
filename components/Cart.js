@@ -11,6 +11,7 @@ import {
 import { Quantity } from "../styles/ProductDetails";
 import { FaShoppingCart } from "react-icons/fa";
 import { AiFillMinusCircle, AiFillPlusCircle } from "react-icons/ai";
+import getStripe from "../lib/getStripe";
 
 //Animation variants:
 const card = {
@@ -32,6 +33,18 @@ const cards = {
 export default function Cart() {
   const { cartItems, setShowCart, onAdd, onRemove, totalPrice } =
     useStateContext();
+
+  //Payment
+  const handleCheckout = async () => {
+    const stripe = await getStripe();
+    const response = await fetch("/api/stripe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(cartItems),
+    });
+    const data = await response.json();
+    await stripe.redirectToCheckout({ sessionId: data.id });
+  };
 
   return (
     <CartWrapper
@@ -87,7 +100,7 @@ export default function Cart() {
         {cartItems.length >= 1 && (
           <Checkout layout>
             <h3>Subtotal:{totalPrice}€</h3>
-            <button>Purchase</button>
+            <button onClick={handleCheckout}>Purchase</button>
           </Checkout>
         )}
       </CartStyle>
