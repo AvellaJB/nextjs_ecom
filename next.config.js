@@ -5,6 +5,9 @@ const nextConfig = {
   compiler: {
     styledComponents: true,
   },
+  async redirect() {
+    return [{ source: "/canceled", destination: "/", permanent: true }];
+  },
 };
 
 module.exports = nextConfig;
